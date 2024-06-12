@@ -8,14 +8,39 @@ import net.tim.gui.panel.QuizPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 public class Frame extends JFrame {
 
-    DB_Manager dbManager = new DB_Manager("db.niklas-wecker.de", 3306, "filmdb", "schueler1", "schueler12347!");
+    DB_Manager dbManager;
+
+    {
+        Properties props = new Properties();
+        try {
+            FileInputStream in = new FileInputStream("src/main/resources/db.properties");
+            props.load(in);
+            in.close();
+        } catch (IOException e) {
+            System.out.println("Error reading from properties file");
+            e.printStackTrace();
+        }
+
+        dbManager = new DB_Manager(
+                props.getProperty("db.host"),
+                Integer.parseInt(props.getProperty("db.port")),
+                props.getProperty("db.name"),
+                props.getProperty("db.user"),
+                props.getProperty("db.password")
+        );
+    }
+
     MenuPanel menuPanel = new MenuPanel(this);
     MovieSearchPanel movieSearchPanel = new MovieSearchPanel(dbManager);
     PersonSearchPanel personSearchPanel = new PersonSearchPanel(dbManager);
     QuizPanel quizPanel = new QuizPanel(dbManager);
+
 
     public Frame() {
         super("Movie Explorer");
